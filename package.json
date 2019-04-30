@@ -1,0 +1,15 @@
+{
+  "name": "semrush-api-connector",
+  "version": "0.0.1",
+  "description": "Community connector for Semrush",
+  "scripts": {
+      "push": "cd src; clasp push; cd -"
+  },
+  "repository": "https://github.com/jinified/semrush-api-connector",
+  "author": "jinified <jinified@gmail.com>",
+  "license": "MIT",
+  "private": null
+  "dependencies": {
+    "@google/clasp": "^2.1.0"
+  }
+}
