@@ -8,7 +8,7 @@
   "repository": "https://github.com/jinified/semrush-api-connector",
   "author": "jinified <jinified@gmail.com>",
   "license": "MIT",
-  "private": null
+  "private": null,
   "dependencies": {
     "@google/clasp": "^2.1.0"
   }

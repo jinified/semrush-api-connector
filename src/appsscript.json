@@ -1,6 +1,12 @@
 {
-  "timeZone": "Asia/Hong_Kong",
   "dependencies": {
   },
-  "exceptionLogging": "STACKDRIVER"
+  "dataStudio": {
+    "name": "Semrush Connector",
+    "company": "None",
+    "logoUrl": "http://vertiklik.com/wp-content/uploads/semrush_logo_icon.png",
+    "addonUrl": "https://github.com/jinified/semrush-api-connector",
+    "supportUrl": "https://github.com/jinified/semrush-api-connector",
+    "description": "This connector extracts project level information from Semrush"
+  }
 }
