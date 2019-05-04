@@ -1,169 +1,161 @@
+var scriptProperties = PropertiesService.getScriptProperties();
+
+function setLastRetrievalDate(){
+  var key = 'DATE';
+  var property = new Date().toISOString();
+  Logger.log("Set Key: " + key + " Value: " + property);
+  scriptProperties.setProperty(key, property);
+}
+
+function shouldRefreshData(refreshRate){
+  var scriptProperties = PropertiesService.getScriptProperties();
+  var lastRetrievalDate = new Date(scriptProperties.getProperty('DATE'));
+  
+  if (lastRetrievalDate === null) {
+    return true
+  }
+  var today = new Date();
+  var oneDay = 24*60*60*1000;
+  Logger.log("Last Date")
+  Logger.log(lastRetrievalDate)
+  var diffDays = Math.round(Math.abs((today.getTime() - lastRetrievalDate.getTime())/(oneDay)));
+  Logger.log("Diff Days");
+  return diffDays > refreshRate;
+}
+
+
 function getAuthType() {
   return {
     type: "NONE"
   };
 }
 
+function isAdminUser() {
+  return true;
+}
+
 function getConfig() {
-  return {
-    dateRangeRequired: true
-  };
+    var cc = DataStudioApp.createCommunityConnector();
+    var config = cc.getConfig();
+
+    config.newInfo()
+        .setId('instructions')
+        .setText('Semrush Configurations');
+
+     config.newTextInput()
+      .setId('apiKey')
+      .setName('API Key')
+      .setPlaceholder('API KEY')
+      .setAllowOverride(true);
+
+     config.newTextInput()
+      .setId('projectId')
+      .setName('Project ID')
+      .setPlaceholder('Project ID')
+      .setAllowOverride(true);
+
+     config.newTextInput()
+      .setId('refreshRate')
+      .setName('Days to refresh')
+      .setPlaceholder('7')
+      .setAllowOverride(true);
+
+    return config.build()
 }
 
 function getSchema() {
   return {
     schema: [
       {
-        name: 'track_name',
-        label: 'Track Name',
+        name: 'site_url',
+        label: 'Site URL',
         dataType: 'STRING',
         semantics: {
           conceptType: 'DIMENSION'
         }
       },
       {
-        name: 'artist',
-        label: 'Artist',
-        dataType: 'STRING',
-        semantics: {
-          conceptType: 'DIMENSION'
-        }
-      },
-      {
-        name: 'played_at_hour',
-        label: 'Played at (date + hour)',
-        dataType: 'STRING',
-        semantics: {
-          conceptType: 'DIMENSION',
-          semanticGroup: 'DATETIME',
-          semanticType: 'YEAR_MONTH_DAY_HOUR'
-        }
-      },
-      {
-        name: 'played_at_date',
-        label: 'Played at (date)',
-        dataType: 'STRING',
-        semantics: {
-          conceptType: 'DIMENSION',
-          semanticGroup: 'DATETIME',
-          semanticType: 'YEAR_MONTH_DAY'
-        }
-      },
-      {
-        name: 'plays',
-        label: 'Plays',
-        dataType: 'NUMBER',
-        formula: 'COUNT(track_name)',
-        semantics: {
-          conceptType: 'METRIC',
-          isReaggregatable: false
-        }
-      },
-      {
-        name: 'tracks_count',
-        label: 'Played Tracks',
-        dataType: 'NUMBER',
-        formula: 'COUNT(track_name)',
-        semantics: {
-          conceptType: 'METRIC',
-          isReaggregatable: false
-        }
-      },
-      {
-        name: 'popularity',
-        label: 'Popularity',
+        name: 'errors',
+        label: 'Errors',
         dataType: 'NUMBER',
         semantics: {
           conceptType: 'METRIC'
         }
-      }
+      },
+      {
+        name: 'quality',
+        label: 'Quality',
+        dataType: 'NUMBER',
+        semantics: {
+          conceptType: 'METRIC'
+        }
+      },
+      {
+        name: 'quality_delta',
+        label: 'Change in Quality',
+        dataType: 'NUMBER',
+        semantics: {
+          conceptType: 'METRIC'
+        }
+      },
     ]
   };
 }
 
 function getData(request) {
-  // Prepare the schema for the fields requested.
-  var dataSchema = [];
-  var fixedSchema = getSchema().schema;
-  request.fields.forEach(function(field) {
-    for (var i = 0; i < fixedSchema.length; i++) {
-      if (fixedSchema[i].name == field.name) {
-        dataSchema.push(fixedSchema[i]);
-        break;
-      }
+    // Prepare the schema for the fields requested.
+    var projectId = request.configParams.projectId
+    var apiKey = request.configParams.apiKey
+    var refreshRate = parseInt(request.configParams.refreshRate)
+    var dataSchema = [];
+    var fixedSchema = getSchema().schema;
+    request.fields.forEach(function(field) {
+        for (var i = 0; i < fixedSchema.length; i++) {
+            if (fixedSchema[i].name == field.name) {
+                dataSchema.push(fixedSchema[i]);
+                break;
+            }
+        }
+    });
+    
+    if (shouldRefreshData(refreshRate)) {
+      var url = "https://api.semrush.com/reports/v1/projects/" + projectId + "/siteaudit/info?key=" + apiKey;
+      var result = UrlFetchApp.fetch(url)
+      scriptProperties.setProperty('DATA', result);
+      setLastRetrievalDate();
+      Logger.log("Refresh data");
     }
-  });
-// We'll query Spotify API here. For now let's just return two mocked records
-  var mockedData = {
-    items: [
-      {
-        track: {
-          name: "Voice of the New Generation",
-          popularity: 25,
-          artists: [
-            {
-              name: "Santa Cruz"
-            }
-          ]
-        },
-        played_at: "2018-06-08T16:16:13.185Z"
-      },
-      {
-        track: {
-          name: "Shorty Wanna Be A Thug",
-          popularity: 59,
-          artists: [
-            {
-              name: "2Pac"
-            }
-          ]
-        },
-        played_at: "2018-06-08T14:11:02Z"
-      }
-    ]
-  };
-// Prepare the tabular data.
-  var data = [];
-  mockedData.items.forEach(function(play) {
+
+    Logger.log("Showing result");
+    var result = JSON.parse(scriptProperties.getProperty('DATA'));
+    Logger.log(result);
+
+    // Prepare the tabular data.
+    var data = [];
     var values = [];
-    var playTime = new Date(play.played_at);
-    // Google expects YYMMDD format
-    var playedAtDate = playTime.toISOString().slice(0, 10).replace(/-/g, "");
-    // Provide values in the order defined by the schema.
     dataSchema.forEach(function(field) {
-      switch (field.name) {
-      case 'track_name':
-        values.push(play.track.name);
-        break;
-      case 'artist':
-        values.push(play.track.artists[0].name);
-        break;
-      case 'played_at_hour':
-        values.push(
-          playedAtDate +
-          (playTime.getHours() < 10 ? '0' : '') + playTime.getHours()
-        );
-        break;
-      case 'played_at_date':
-        values.push(playedAtDate);
-        break;
-      case 'popularity':
-        values.push(play.track.popularity);
-        break;
-      default:
-        values.push('');
-      }
+        switch (field.name) {
+            case 'site_url':
+                values.push(result['url']);
+                break;
+            case 'errors':
+                values.push(result['errors']);
+                break;
+            case 'quality':
+                values.push(result['current_snapshot']['quality']['value']);
+                break;
+            case 'quality_delta':
+                values.push(result['current_snapshot']['quality']['delta']);
+                break;
+            default:
+                values.push('');
+        }
     });
     data.push({
-      values: values
+        values: values
     });
-  });
-return {
-    schema: dataSchema,
-    rows: data
-  };
-}
-
-function isAdminUser() {
-  return true;
+    return {
+        schema: dataSchema,
+        rows: data
+    };
 }
