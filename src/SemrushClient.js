@@ -46,7 +46,6 @@ SemrushClient.prototype.fetchFromCache = function(resultString) {
 };
 
 SemrushClient.prototype.storeInCache = function(result) {
-  var key = 'DATE';
   var cachedDate = new Date().toISOString();
   console.log('Setting data to cache...');
   try {
@@ -59,7 +58,7 @@ SemrushClient.prototype.storeInCache = function(result) {
 
 // Get keywords sorted in ascending order of difficulty to wrestle control from competitors
 SemrushClient.prototype.getKeywordsToFocus = function(apiKey) {
-  var url = 'https://api.semrush.com' + '/?type=domain_domains&database=my&display_limit=10&domains=*|or|sinarharian.com.my|*|or|utusan.com.my|*|or|bharian.com.my&display_sort=kd_asc&key=' + apiKey;
+  var url = this.requestConfig['apiEndpoint'] + '/?type=domain_domains&database=my&display_limit=10&domains=*|or|sinarharian.com.my|*|or|utusan.com.my|*|or|bharian.com.my&display_sort=kd_asc&key=' + apiKey;
   console.log('Keyword Gap Analysis Report: Requesting URL %s', url);
   // var result = UrlFetchApp.fetch(url)
   return {
@@ -70,7 +69,7 @@ SemrushClient.prototype.getKeywordsToFocus = function(apiKey) {
 SemrushClient.prototype.getSiteVisibility = function(projectId, apiKey, rootDomain) {
   // Domain pattern that will be considered for measurement
   var trackedURL = '*.' + rootDomain + '%2F*';
-  var url = 'https://api.semrush.com/reports/v1/projects/' + projectId + '/tracking/info?key=' + apiKey + '&action=report&type=tracking_overview_organic&linktype_filter=0&url=' + trackedURL + '&serp_feature_filter=fsn';
+  var url = this.requestConfig['apiEndpoint'] + '/reports/v1/projects/' + projectId + '/tracking/info?key=' + apiKey + '&action=report&type=tracking_overview_organic&linktype_filter=0&url=' + trackedURL + '&serp_feature_filter=fsn';
   console.log('Visibilty Report: Requesting URL %s', url);
   var result = JSON.parse(this.urlFetchApp.fetch(url));
   return {
@@ -79,7 +78,7 @@ SemrushClient.prototype.getSiteVisibility = function(projectId, apiKey, rootDoma
 };
 
 SemrushClient.prototype.getSiteAudit = function(projectId, apiKey) {
-  var url = 'https://api.semrush.com/reports/v1/projects/' + projectId + '/siteaudit/info?key=' + apiKey;
+  var url = this.requestConfig['apiEndpoint'] + '/reports/v1/projects/' + projectId + '/siteaudit/info?key=' + apiKey;
   console.log('Site Audit Report: Requesting URL %s', url);
   var result = JSON.parse(this.urlFetchApp.fetch(url));
   return {

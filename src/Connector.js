@@ -87,6 +87,12 @@ Connector.prototype.getConfig = function() {
     .setText('Semrush Configurations');
 
   config.newTextInput()
+    .setId('apiEndpoint')
+    .setName('API Endpoint')
+    .setPlaceholder('https://api.semrush.com')
+    .setAllowOverride(true);
+
+  config.newTextInput()
     .setId('apiKey')
     .setName('API Key')
     .setPlaceholder('API KEY')
@@ -137,11 +143,16 @@ Connector.prototype.isAdminUser = function() {
 Connector.prototype.getData = function(request) {
   var projectId = request.configParams.projectId;
   var apiKey = request.configParams.apiKey;
+  var apiEndpoint = request.configParams.endPoint;
   var rootDomain = request.configParams.rootDomain;
   var refreshRate = parseInt(request.configParams.refreshRate);
   var dataSchema = this.prepareSchema(request);
   var semrushClient = new SemrushClient(this.services.PropertyService, this.services.UrlFetchApp, {
-    projectId, apiKey, rootDomain, refreshRate
+    projectId: projectId,
+    apiKey: apiKey,
+    rootDomain: rootDomain,
+    refreshRate: refreshRate,
+    apiEndpoint: apiEndpoint
   });
   var result = semrushClient.getSEOInfo();
   return this.buildTabularData(result, dataSchema);
