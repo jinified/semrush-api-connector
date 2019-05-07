@@ -11,15 +11,28 @@
     "author": "jinified <jinified@gmail.com>",
     "license": "MIT",
     "private": null,
-    "dependencies": {"@google/clasp": "^2.1.0"},
+    "dependencies": {
+        "@google/clasp": "^2.1.0"
+    },
     "devDependencies": {
         "babel-core": "^6.26.3",
         "babel-jest": "^24.8.0",
         "babel-preset-env": "^1.7.0",
+        "eslint": "^5.16.0",
+        "eslint-plugin-jest": "^22.5.1",
         "jest": "^24.8.0"
     },
     "jest": {
-        "collectCoverageFrom": ["src/**/*{js,jsx}", "!<rootDir>/node_modules/"],
-        "coverageReporters": ["json", "html", "lcov", "text", "clover"]
+        "collectCoverageFrom": [
+            "src/**/*{js,jsx}",
+            "!<rootDir>/node_modules/"
+        ],
+        "coverageReporters": [
+            "json",
+            "html",
+            "lcov",
+            "text",
+            "clover"
+        ]
     }
 }
