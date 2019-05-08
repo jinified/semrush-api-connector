@@ -57,8 +57,8 @@ SemrushClient.prototype.storeInCache = function(result) {
 };
 
 // Get keywords sorted in ascending order of difficulty to wrestle control from competitors
-SemrushClient.prototype.getKeywordsToFocus = function(apiKey) {
-  var url = this.requestConfig['apiEndpoint'] + '/?type=domain_domains&database=my&display_limit=10&domains=*|or|sinarharian.com.my|*|or|utusan.com.my|*|or|bharian.com.my&display_sort=kd_asc&key=' + apiKey;
+SemrushClient.prototype.getKeywordsToFocus = function(url) {
+  // var url = this.requestConfig['apiEndpoint'] + '/?type=domain_domains&database=my&display_limit=10&domains=*|or|sinarharian.com.my|*|or|utusan.com.my|*|or|bharian.com.my&display_sort=kd_asc&key=' + apiKey;
   console.log('Keyword Gap Analysis Report: Requesting URL %s', url);
   // var result = UrlFetchApp.fetch(url)
   return {
@@ -66,10 +66,10 @@ SemrushClient.prototype.getKeywordsToFocus = function(apiKey) {
   };
 };
 
-SemrushClient.prototype.getSiteVisibility = function(projectId, apiKey, rootDomain) {
+SemrushClient.prototype.getSiteVisibility = function(url) {
   // Domain pattern that will be considered for measurement
-  var trackedURL = '*.' + rootDomain + '%2F*';
-  var url = this.requestConfig['apiEndpoint'] + '/reports/v1/projects/' + projectId + '/tracking/info?key=' + apiKey + '&action=report&type=tracking_overview_organic&linktype_filter=0&url=' + trackedURL + '&serp_feature_filter=fsn';
+  // var trackedURL = '*.' + rootDomain + '%2F*';
+  // var url = this.requestConfig['apiEndpoint'] + '/reports/v1/projects/' + projectId + '/tracking/info?key=' + apiKey + '&action=report&type=tracking_overview_organic&linktype_filter=0&url=' + trackedURL + '&serp_feature_filter=fsn';
   console.log('Visibilty Report: Requesting URL %s', url);
   var result = JSON.parse(this.urlFetchApp.fetch(url));
   return {
@@ -77,8 +77,8 @@ SemrushClient.prototype.getSiteVisibility = function(projectId, apiKey, rootDoma
   };
 };
 
-SemrushClient.prototype.getSiteAudit = function(projectId, apiKey) {
-  var url = this.requestConfig['apiEndpoint'] + '/reports/v1/projects/' + projectId + '/siteaudit/info?key=' + apiKey;
+SemrushClient.prototype.getSiteAudit = function(url) {
+  // var url = this.requestConfig['apiEndpoint'] + '/reports/v1/projects/' + projectId + '/siteaudit/info?key=' + apiKey;
   console.log('Site Audit Report: Requesting URL %s', url);
   var result = JSON.parse(this.urlFetchApp.fetch(url));
   return {
@@ -91,12 +91,12 @@ SemrushClient.prototype.getSiteAudit = function(projectId, apiKey) {
 };
 
 SemrushClient.prototype.fetchFromApi = function(config) {
-  var projectId = config['projectId'];
-  var apiKey = config['apiKey'];
-  var rootDomain = config['rootDomain'];
-  var overallResult = this.getSiteAudit(projectId, apiKey);
-  var siteVisibility = this.getSiteVisibility(projectId, apiKey, rootDomain);
-  var recommendedKeywords = this.getKeywordsToFocus(apiKey);
+  var siteAuditURL = config['siteAuditURL'];
+  var positionTrackingURL = config['positionTrackingURL'];
+  var keywordGapAnalysisURL = config['keywordGapAnalysisURL'];
+  var overallResult = this.getSiteAudit(siteAuditURL);
+  var siteVisibility = this.getSiteVisibility(positionTrackingURL);
+  var recommendedKeywords = this.getKeywordsToFocus(keywordGapAnalysisURL);
   overallResult['visibility'] = siteVisibility['visibility'];
   overallResult['keywords'] = recommendedKeywords['keywords'];
   return overallResult;

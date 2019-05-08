@@ -116,6 +116,28 @@ Connector.prototype.getConfig = function() {
     .setPlaceholder('astroawani.com')
     .setAllowOverride(true);
 
+  config.newInfo()
+    .setId('apiEndpoints instruction')
+    .setText('API Endpoints');
+
+  config.newTextInput()
+    .setId('siteAuditURL')
+    .setName('Site Audit Endpoint')
+    .setPlaceholder('Endpoint')
+    .setAllowOverride(true);
+
+  config.newTextInput()
+    .setId('positionTrackingURL')
+    .setName('Position Tracking Endpoint')
+    .setPlaceholder('Endpoint')
+    .setAllowOverride(true);
+
+  config.newTextInput()
+    .setId('keywordGapAnalysisURL')
+    .setName('Keyword Gap Analysis Endpoint')
+    .setPlaceholder('Endpoint')
+    .setAllowOverride(true);
+
   return config.build();
 };
 
@@ -146,13 +168,19 @@ Connector.prototype.getData = function(request) {
   var apiEndpoint = request.configParams.endPoint;
   var rootDomain = request.configParams.rootDomain;
   var refreshRate = parseInt(request.configParams.refreshRate);
+  var siteAuditURL = request.configParams.siteAuditURL;
+  var positionTrackingURL = request.configParams.positionTrackingURL;
+  var keywordGapAnalysisURL = request.configParams.keywordGapAnalysisURL;
   var dataSchema = this.prepareSchema(request);
   var semrushClient = new SemrushClient(this.services.PropertyService, this.services.UrlFetchApp, {
     projectId: projectId,
     apiKey: apiKey,
     rootDomain: rootDomain,
     refreshRate: refreshRate,
-    apiEndpoint: apiEndpoint
+    apiEndpoint: apiEndpoint,
+    siteAuditURL: siteAuditURL,
+    positionTrackingURL: positionTrackingURL,
+    keywordGapAnalysisURL: keywordGapAnalysisURL
   });
   var result = semrushClient.getSEOInfo();
   return this.buildTabularData(result, dataSchema);
