@@ -4,7 +4,7 @@
     "description": "Community connector for Semrush",
     "scripts": {
         "push": "cd src; clasp push; cd -",
-        "test": "jest --forceExit --detectOpenHandles --coverage  --coverageDirectory=coverage --testPathPattern=\"(/src/.*)\\.(test|spec).js$\"",
+        "test": "jest --watch --forceExit --detectOpenHandles --coverage  --coverageDirectory=coverage --testPathPattern=\"(/src/.*)\\.(test|spec).js$\"",
         "test:unit": "jest --watch --forceExit --detectOpenHandles --testPathPattern=\"(/src/.*)\\.(spec).js$\""
     },
     "repository": "https://github.com/jinified/semrush-api-connector",
@@ -15,6 +15,7 @@
         "@google/clasp": "^2.1.0"
     },
     "devDependencies": {
+        "@babel/preset-env": "^7.4.4",
         "babel-core": "^6.26.3",
         "babel-jest": "^24.8.0",
         "babel-preset-env": "^1.7.0",
@@ -24,8 +25,11 @@
     },
     "jest": {
         "collectCoverageFrom": [
-            "src/**/*{js,jsx}",
-            "!<rootDir>/node_modules/"
+            "src/**/*{js,jsx}"
+        ],
+        "coveragePathIgnorePatterns": [
+            "node_modules",
+            "src/mocks"
         ],
         "coverageReporters": [
             "json",

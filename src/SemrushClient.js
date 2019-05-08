@@ -23,6 +23,7 @@ SemrushClient.prototype.getSEOInfo = function() {
   var result = null;
   result = this.fetchFromCache(dataCache);
   if (!result && this.shouldRefreshData(this.requestConfig['refreshRate'])) {
+    console.log('Refresh cache');
     result = this.fetchFromApi(this.requestConfig);
     this.storeInCache(result);
   }
@@ -41,7 +42,6 @@ SemrushClient.prototype.fetchFromCache = function(resultString) {
   } catch (e) {
     console.log('Error when fetching from cache:', e);
   }
-
   return result;
 };
 
@@ -60,9 +60,9 @@ SemrushClient.prototype.storeInCache = function(result) {
 SemrushClient.prototype.getKeywordsToFocus = function(url) {
   // var url = this.requestConfig['apiEndpoint'] + '/?type=domain_domains&database=my&display_limit=10&domains=*|or|sinarharian.com.my|*|or|utusan.com.my|*|or|bharian.com.my&display_sort=kd_asc&key=' + apiKey;
   console.log('Keyword Gap Analysis Report: Requesting URL %s', url);
-  // var result = UrlFetchApp.fetch(url)
+  var result = JSON.parse(this.urlFetchApp.fetch(url));
   return {
-    keywords: ['malaysia kini bm', 'shopee', 'br1m', 'kosmo', 'bank rakyat', 'myeg']
+    keywords: result['keywords']
   };
 };
 
@@ -70,16 +70,16 @@ SemrushClient.prototype.getSiteVisibility = function(url) {
   // Domain pattern that will be considered for measurement
   // var trackedURL = '*.' + rootDomain + '%2F*';
   // var url = this.requestConfig['apiEndpoint'] + '/reports/v1/projects/' + projectId + '/tracking/info?key=' + apiKey + '&action=report&type=tracking_overview_organic&linktype_filter=0&url=' + trackedURL + '&serp_feature_filter=fsn';
-  console.log('Visibilty Report: Requesting URL %s', url);
   var result = JSON.parse(this.urlFetchApp.fetch(url));
+  console.log('Visibilty Report: Requesting URL %s', url, result);
   return {
-    visbility: result['visibility']
+    visibility: result['visibility']
   };
 };
 
 SemrushClient.prototype.getSiteAudit = function(url) {
   // var url = this.requestConfig['apiEndpoint'] + '/reports/v1/projects/' + projectId + '/siteaudit/info?key=' + apiKey;
-  console.log('Site Audit Report: Requesting URL %s', url);
+  console.log('Site Audit Report: Requesting URL %s', url, this.urlFetchApp.fetch(url));
   var result = JSON.parse(this.urlFetchApp.fetch(url));
   return {
     url: result['url'],
@@ -99,18 +99,21 @@ SemrushClient.prototype.fetchFromApi = function(config) {
   var recommendedKeywords = this.getKeywordsToFocus(keywordGapAnalysisURL);
   overallResult['visibility'] = siteVisibility['visibility'];
   overallResult['keywords'] = recommendedKeywords['keywords'];
+  console.log('Overall Result', overallResult);
   return overallResult;
 };
 
 SemrushClient.prototype.shouldRefreshData = function(refreshRate) {
-  var lastRetrievalDate = new Date(this.propertiesService.getScriptProperties().getProperty('DATE'));
+  var lastRetrievalDate = this.propertiesService.getScriptProperties().getProperty('DATE');
 
-  if (lastRetrievalDate === null) {
+  console.log('Should refresh data', lastRetrievalDate);
+  if (!lastRetrievalDate) {
+    console.log('Cache is empty');
     return true;
   }
   var today = new Date();
   var oneDay = 24 * 60 * 60 * 1000;
-  var diffDays = Math.round(Math.abs((today.getTime() - lastRetrievalDate.getTime()) / (oneDay)));
+  var diffDays = Math.round(Math.abs((today.getTime() - new Date(lastRetrievalDate).getTime()) / (oneDay)));
   return diffDays >= refreshRate;
 };
 
