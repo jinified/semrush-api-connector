@@ -1,14 +1,14 @@
 /**
  * Constructor for SemrushClient
  *
- * @param propertyService {object} - An object with same interface as Google's PropertyService
+ * @param propertiesService {object} - An object with same interface as Google's PropertyService
  * @param urlFetchApp {object} - An object with same interface as Google's UrlFetchApp
  * @param requestConfig {object} - A request configuration
  *
  * @return {object} a Connector object.
  */
-function SemrushClient(propertyService, urlFetchApp, requestConfig) {
-  this.propertyService = propertyService;
+function SemrushClient(propertiesService, urlFetchApp, requestConfig) {
+  this.propertiesService = propertiesService;
   this.urlFetchApp = urlFetchApp;
   this.requestConfig = requestConfig;
 
@@ -19,7 +19,7 @@ function SemrushClient(propertyService, urlFetchApp, requestConfig) {
  * @return {array} Array of Spotify play objects
  */
 SemrushClient.prototype.getSEOInfo = function() {
-  var dataCache = this.propertyService.getScriptProperties().getProperty('DATA');
+  var dataCache = this.propertiesService.getScriptProperties().getProperty('DATA');
   var result = null;
   result = this.fetchFromCache(dataCache);
   if (!result && this.shouldRefreshData(this.requestConfig['refreshRate'])) {
@@ -49,8 +49,8 @@ SemrushClient.prototype.storeInCache = function(result) {
   var cachedDate = new Date().toISOString();
   console.log('Setting data to cache...');
   try {
-    this.propertyService.getScriptProperties().setProperty('DATE', cachedDate);
-    this.propertyService.getScriptProperties().setProperty('DATA', JSON.stringify(result));
+    this.propertiesService.getScriptProperties().setProperty('DATE', cachedDate);
+    this.propertiesService.getScriptProperties().setProperty('DATA', JSON.stringify(result));
   } catch (e) {
     console.log('Error when storing in cache', e);
   }
@@ -103,7 +103,7 @@ SemrushClient.prototype.fetchFromApi = function(config) {
 };
 
 SemrushClient.prototype.shouldRefreshData = function(refreshRate) {
-  var lastRetrievalDate = new Date(this.propertyService.getScriptProperties().getProperty('DATE'));
+  var lastRetrievalDate = new Date(this.propertiesService.getScriptProperties().getProperty('DATE'));
 
   if (lastRetrievalDate === null) {
     return true;

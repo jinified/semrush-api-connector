@@ -172,7 +172,7 @@ Connector.prototype.getData = function(request) {
   var positionTrackingURL = request.configParams.positionTrackingURL;
   var keywordGapAnalysisURL = request.configParams.keywordGapAnalysisURL;
   var dataSchema = this.prepareSchema(request);
-  var semrushClient = new SemrushClient(this.services.PropertyService, this.services.UrlFetchApp, {
+  var semrushClient = new SemrushClient(this.services.PropertiesService, this.services.UrlFetchApp, {
     projectId: projectId,
     apiKey: apiKey,
     rootDomain: rootDomain,
