@@ -36,6 +36,9 @@ jobs:
       - run:
           name: "Send coverage to CodeCov"
           command: yarn add --dev codecov && ./node_modules/.bin/codecov
+      - run:
+          name: "Push changes to App Script"
+          command: yarn push
   deploy:
     docker:
       - image: circleci/node:9.10.0
@@ -71,6 +74,12 @@ jobs:
 
 workflows:
   version: 2
-  build-deploy:
+  deploy:
     jobs:
       - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
