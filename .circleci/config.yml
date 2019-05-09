@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/node:7.10
+      - image: circleci/node:9.10.0
 
     working_directory: ~/repo
 
@@ -38,7 +38,7 @@ jobs:
           command: yarn add --dev codecov && ./node_modules/.bin/codecov
   deploy:
     docker:
-      - image: circleci/node:7.10
+      - image: circleci/node:9.10.0
 
     working_directory: ~/repo
 
