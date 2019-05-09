@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/node:9.10.0
+        - image: circleci/node:latest
 
     working_directory: ~/repo
 
@@ -41,7 +41,7 @@ jobs:
           command: yarn push
   deploy:
     docker:
-      - image: circleci/node:9.10.0
+      - image: circleci/node:latest
 
     working_directory: ~/repo
 
