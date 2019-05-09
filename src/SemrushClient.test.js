@@ -49,12 +49,42 @@ beforeEach(() => {
 });
 
 describe('Semrush Client', () => {
-  test('getSEOInfo should return appropriate response', () => {
+  test('getSEOInfo when refreshRate is 0 endpoint will be called', () => {
     const result = service.getSEOInfo();
     expect(result).toEqual({
       url: 'www.astroawani.com',
       errors: 21,
       quality: 0.79,
+      quality_delta: 0,
+      site_performance: 0.84,
+      visibility: 41.8269,
+      keywords: ['malaysia kini bm', 'shopee', 'br1m', 'kosmo', 'bank rakyat', 'myeg']
+    });
+  });
+
+  test('getSEOInfo when refreshRate is > 0 cache result shall be returned', () => {
+    // Trigger retrieval from cache
+    requestConfig['refreshRate'] = 7;
+
+    // Preload cache with result
+    propertiesServiceMock.getScriptProperties().setProperty('DATE', new Date());
+    propertiesServiceMock.getScriptProperties().setProperty('DATA', JSON.stringify({
+      url: 'www.astroawani.com',
+      errors: 0,
+      quality: 0.80,
+      quality_delta: 0,
+      site_performance: 0.84,
+      visibility: 41.8269,
+      keywords: ['malaysia kini bm', 'shopee', 'br1m', 'kosmo', 'bank rakyat', 'myeg']
+    }));
+
+    const result = service.getSEOInfo();
+
+    expect(urlFetchAppMock.calls).toEqual({}, 'should not call endpoints');
+    expect(result).toEqual({
+      url: 'www.astroawani.com',
+      errors: 0,
+      quality: 0.80,
       quality_delta: 0,
       site_performance: 0.84,
       visibility: 41.8269,
