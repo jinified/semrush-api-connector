@@ -4,8 +4,11 @@
     "description": "Community connector for Semrush",
     "scripts": {
         "push": "cd src; clasp push; cd -",
-        "test": "jest --watch --forceExit --detectOpenHandles --coverage  --coverageDirectory=coverage --testPathPattern=\"(/src/.*)\\.(test|spec).js$\"",
-        "test:unit": "jest --watch --forceExit --detectOpenHandles --testPathPattern=\"(/src/.*)\\.(spec).js$\""
+        "coverage": "jest -coverage  --coverageDirectory=coverage --testPathPattern=\"(/src/.*)\\.(test|spec).js$\"",
+        "test": "jest --forceExit --detectOpenHandles --coverage  --coverageDirectory=coverage --testPathPattern=\"(/src/.*)\\.(test|spec).js$\"",
+        "test:unit": "jest --watch --forceExit --detectOpenHandles --testPathPattern=\"(/src/.*)\\.(spec).js$\"",
+        "lint": "eslint .",
+        "deploy-production": "./deploy.sh 'Production'"
     },
     "repository": "https://github.com/jinified/semrush-api-connector",
     "author": "jinified <jinified@gmail.com>",
